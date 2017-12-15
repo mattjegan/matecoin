@@ -5,9 +5,7 @@ def main():
     bc = BlockChain()
     try:
         for i in range(1000):
-            bc.mineBlock({
-                'tx_id': i
-            })
+            bc.mineBlock()
     except KeyboardInterrupt:
         bc.save()
 

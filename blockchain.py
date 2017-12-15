@@ -13,15 +13,17 @@ class BlockChain(object):
             genesis_block = Block()
             self.addBlock(genesis_block)
 
+        self.next_block = Block(prev_hash=self.blocks[-1].hash)
+
     def addBlock(self, block):
         assert isinstance(block, Block)
         block.mine()
         self.blocks.append(block)
+        return block
 
-    def mineBlock(self, data):
-        assert isinstance(data, dict)
-        block = Block(data, self.blocks[-1].hash)
-        self.addBlock(block)
+    def mineBlock(self):
+        block = self.addBlock(self.next_block)
+        self.next_block = Block(prev_hash=block.hash)
         print(f'Block: {len(self.blocks)} Hash: {block.hash} Nonce: {block.nonce}')
 
     def save(self):
@@ -41,3 +43,6 @@ class BlockChain(object):
             self.blocks.append(block)
 
         db.close()
+
+    def addTransaction(self, send, recv, amount):
+        self.next_block.addTransaction(send, recv, amount)

@@ -1,21 +1,22 @@
 import json
 from hashlib import blake2b
 
+from transaction import Transaction
+
 
 class Block(object):
-    def __init__(self, data={}, prev_hash=None, deserialize=None):
-        assert isinstance(data, dict)
+    def __init__(self, prev_hash=None, deserialize=None):
         assert isinstance(prev_hash, str) or prev_hash is None
         assert isinstance(deserialize, str) or deserialize is None
 
         if deserialize is None:
-            self.data = data
+            self.transactions = []
             self.prev_hash = prev_hash
             self.hash = None
             self.nonce = -1
         else:
             deserialized = json.loads(deserialize)
-            self.data = deserialized['data']
+            self.transactions = deserialized['transactions']
             self.prev_hash = deserialized['prev_hash']
             self.hash = deserialized['hash']
             self.nonce = deserialized['nonce']
@@ -31,16 +32,19 @@ class Block(object):
     def getNextHash(self):
         self.nonce += 1
         if self.prev_hash is None:
-            return blake2b((str(self.data) + str('doh') + str(self.nonce)).encode('utf-8'))
-        return blake2b((str(self.data) + str(self.prev_hash) + str(self.nonce)).encode('utf-8'))
+            return blake2b((str([t.toDict() for t in self.transactions]) + str('doh') + str(self.nonce)).encode('utf-8'))
+        return blake2b((str([t.toDict() for t in self.transactions]) + str(self.prev_hash) + str(self.nonce)).encode('utf-8'))
 
     def satisfies(self, curr_hash):
         return curr_hash.hexdigest().startswith('1729')  # Ramanujan's Number
 
     def serialize(self):
         return json.dumps({
-            'data': self.data,
+            'transactions': [t.toDict() for t in self.transactions],
             'prev_hash': self.prev_hash,
             'hash': self.hash,
             'nonce': self.nonce
         })
+
+    def addTransaction(self, send, recv, amount):
+        self.transactions.append(Transaction(send, recv, amount))
