@@ -1,13 +1,24 @@
+import json
 from hashlib import blake2b
 
+
 class Block(object):
-    def __init__(self, data={}, prev=None):
+    def __init__(self, data={}, prev_hash=None, deserialize=None):
         assert isinstance(data, dict)
-        assert isinstance(prev, Block) or prev is None
-        self.data = data
-        self.prev = prev
-        self.hash = None
-        self.nonce = -1
+        assert isinstance(prev_hash, str) or prev_hash is None
+        assert isinstance(deserialize, str) or deserialize is None
+
+        if deserialize is None:
+            self.data = data
+            self.prev_hash = prev_hash
+            self.hash = None
+            self.nonce = -1
+        else:
+            deserialized = json.loads(deserialize)
+            self.data = deserialized['data']
+            self.prev_hash = deserialized['prev_hash']
+            self.hash = deserialized['hash']
+            self.nonce = deserialized['nonce']
         
     def mine(self):
         assert self.hash is None
@@ -19,9 +30,17 @@ class Block(object):
 
     def getNextHash(self):
         self.nonce += 1
-        if self.prev is None:
+        if self.prev_hash is None:
             return blake2b((str(self.data) + str('doh') + str(self.nonce)).encode('utf-8'))
-        return blake2b((str(self.data) + str(self.prev.hash) + str(self.nonce)).encode('utf-8'))
+        return blake2b((str(self.data) + str(self.prev_hash) + str(self.nonce)).encode('utf-8'))
 
     def satisfies(self, curr_hash):
         return curr_hash.hexdigest().startswith('1729')  # Ramanujan's Number
+
+    def serialize(self):
+        return json.dumps({
+            'data': self.data,
+            'prev_hash': self.prev_hash,
+            'hash': self.hash,
+            'nonce': self.nonce
+        })
