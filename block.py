@@ -1,5 +1,6 @@
 import json
 from hashlib import blake2b
+from collections import defaultdict
 
 from transaction import Transaction
 
@@ -16,7 +17,7 @@ class Block(object):
             self.nonce = -1
         else:
             deserialized = json.loads(deserialize)
-            self.transactions = deserialized['transactions']
+            self.transactions = [Transaction(deserialize=t) for t in deserialized['transactions']]
             self.prev_hash = deserialized['prev_hash']
             self.hash = deserialized['hash']
             self.nonce = deserialized['nonce']
@@ -48,3 +49,10 @@ class Block(object):
 
     def addTransaction(self, send, recv, amount):
         self.transactions.append(Transaction(send, recv, amount))
+
+    def getTransactionDiff(self):
+        diff = defaultdict(lambda: 0)
+        for t in self.transactions:
+            diff[t.send] -= t.amount
+            diff[t.recv] += t.amount
+        return dict(diff)

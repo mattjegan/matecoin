@@ -11,6 +11,10 @@ class BlockChain(object):
         # Check if the blockchain exists and load it
         self.load()
 
+        print()
+        for wallet in self.wallets:
+            print(f'{wallet[:4]}: {self.wallets[wallet].amount}')
+
         self.last_save = len(self.blocks)
 
         if len(self.blocks) == 0:
@@ -44,6 +48,7 @@ class BlockChain(object):
         for entry in db:
             entry = entry.rstrip()
             block = Block(deserialize=entry)
+            self.updateWalletsFromDiff(block.getTransactionDiff())
             self.blocks.append(block)
 
         db.close()
@@ -74,3 +79,9 @@ class BlockChain(object):
         # Verify there is enough DOH in the wallet
         if self.wallets[send].amount < amount:
             raise WalletAmountTooLow('The sending wallet did not have enough DOH')
+
+    def updateWalletsFromDiff(self, diff):
+        for addr, value in diff.items():
+            if addr not in self.wallets:
+                self.wallets[addr] = Wallet(addr)
+            self.wallets[addr].amount += value
