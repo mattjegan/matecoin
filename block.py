@@ -26,7 +26,10 @@ class Block(object):
         assert isinstance(minerAddr, str) or minerAddr is None
         assert self.hash is None
         assert self.nonce == -1
-        self.addReward(minerAddr)
+
+        if minerAddr:
+            self.addReward(minerAddr)
+
         curr_hash = self.getNextHash()
         while not self.satisfies(curr_hash):
             curr_hash = self.getNextHash()
