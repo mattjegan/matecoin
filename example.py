@@ -8,9 +8,11 @@ def main():
 
     # Create a new wallet to mine into (this could be set to the same string each run to maintain your wallet addr)
     # TODO: Make the chain into a cli so we can save wallet addresses locally for mining into
-    my_wallet = bc.createWallet()
-    w1 = bc.createWallet()
-    w2 = bc.createWallet()
+    my_wallet, priv_key = bc.createWallet()
+    bc.savePrivKey(priv_key)
+
+    w1, _ = bc.createWallet()
+    w2, _ = bc.createWallet()
 
     # Mine some coin into w1 and w2
     # Note: blocks don't need transactions in them to give a reward

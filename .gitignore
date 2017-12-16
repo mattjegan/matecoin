@@ -4,3 +4,4 @@ __pycache__
 .idea/
 dd.db
 main.py
+*.pem

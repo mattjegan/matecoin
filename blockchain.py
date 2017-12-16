@@ -67,7 +67,7 @@ class BlockChain(object):
     def createWallet(self):
         wallet = Wallet()
         self.wallets[wallet.address] = wallet
-        return wallet.address
+        return wallet.address, wallet.priv_key
 
     def verifyTransaction(self, send, recv, amount):
         # Verify the wallets exist
@@ -88,3 +88,7 @@ class BlockChain(object):
             if addr not in self.wallets:
                 self.wallets[addr] = Wallet(addr)
             self.wallets[addr].amount += value
+
+    def savePrivKey(self, priv_key):
+        with open('priv_key.pem', 'x') as f:
+            f.write(priv_key.to_pem().decode())
