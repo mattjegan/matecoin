@@ -38,8 +38,16 @@ class Block(object):
     def getNextHash(self):
         self.nonce += 1
         if self.prev_hash is None:
-            return blake2b((str([t.toDict() for t in self.transactions]) + str('doh') + str(self.nonce)).encode('utf-8'))
-        return blake2b((str([t.toDict() for t in self.transactions]) + str(self.prev_hash) + str(self.nonce)).encode('utf-8'))
+            curr_hash = blake2b((str([t.toDict() for t in self.transactions]) + str('doh') + str(self.nonce)).encode('utf-8'))
+        else:
+            curr_hash = blake2b((str([t.toDict() for t in self.transactions]) + str(self.prev_hash) + str(self.nonce)).encode('utf-8'))
+
+        # CODE: Pre-written if we want to add hash difficulty
+        # for _ in range(0, difficulty):
+        #     #print('hashing')
+        #     curr_hash = blake2b(curr_hash.digest())
+
+        return curr_hash
 
     def satisfies(self, curr_hash):
         return curr_hash.hexdigest().startswith('1729')  # Ramanujan's Number
