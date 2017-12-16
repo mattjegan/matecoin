@@ -22,9 +22,11 @@ class Block(object):
             self.hash = deserialized['hash']
             self.nonce = deserialized['nonce']
         
-    def mine(self):
+    def mine(self, minerAddr=None):
+        assert isinstance(minerAddr, str) or minerAddr is None
         assert self.hash is None
         assert self.nonce == -1
+        self.addReward(minerAddr)
         curr_hash = self.getNextHash()
         while not self.satisfies(curr_hash):
             curr_hash = self.getNextHash()
@@ -56,3 +58,8 @@ class Block(object):
             diff[t.send] -= t.amount
             diff[t.recv] += t.amount
         return dict(diff)
+
+    def addReward(self, minerAddr=None):
+        assert isinstance(minerAddr, str) or minerAddr is None
+        # TODO: Is a fixed reward good enough?
+        self.transactions.append(Transaction(recv=minerAddr, amount=1, reward=True))

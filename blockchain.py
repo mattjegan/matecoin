@@ -11,27 +11,22 @@ class BlockChain(object):
         # Check if the blockchain exists and load it
         self.load()
 
-        print()
-        for wallet in self.wallets:
-            print(f'{wallet[:4]}: {self.wallets[wallet].amount}')
-
         self.last_save = len(self.blocks)
 
         if len(self.blocks) == 0:
             genesis_block = Block()
-            self.addBlock(genesis_block)
+            genesis_block.mine()
+            self.blocks.append(genesis_block)
 
         self.next_block = Block(prev_hash=self.blocks[-1].hash)
 
-    def addBlock(self, block):
-        assert isinstance(block, Block)
-        block.mine()
+    def mineBlock(self, minerAddr=None):
+        assert isinstance(minerAddr, str) or minerAddr is None
+        self.next_block.mine(minerAddr)
+        block = self.next_block
         self.blocks.append(block)
-        return block
-
-    def mineBlock(self):
-        block = self.addBlock(self.next_block)
         self.next_block = Block(prev_hash=block.hash)
+        self.updateWalletsFromDiff(block.getTransactionDiff())
         print(f'Block: {len(self.blocks)} Hash: {block.hash} Nonce: {block.nonce}')
 
     def save(self):
@@ -82,6 +77,9 @@ class BlockChain(object):
 
     def updateWalletsFromDiff(self, diff):
         for addr, value in diff.items():
+            if addr == 'reward':  # TODO: Abstract Magic Vals (reward, ramanujan etc)
+                continue
+
             if addr not in self.wallets:
                 self.wallets[addr] = Wallet(addr)
             self.wallets[addr].amount += value

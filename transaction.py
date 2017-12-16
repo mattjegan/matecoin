@@ -2,11 +2,12 @@ import json
 
 
 class Transaction(object):
-    def __init__(self, send='', recv='', amount=0, deserialize=None):
+    def __init__(self, send='', recv='', amount=0, deserialize=None, reward=False):
         assert isinstance(send, str)
         assert isinstance(recv, str)
         assert isinstance(amount, int)
         assert isinstance(deserialize, dict) or deserialize is None
+        assert isinstance(reward, bool)
 
         if deserialize is None:
             self.send = send
@@ -16,6 +17,9 @@ class Transaction(object):
             self.send = deserialize['send']
             self.recv = deserialize['recv']
             self.amount = deserialize['amount']
+
+        if reward:
+            self.send = 'reward'
 
     def serialize(self):
         return json.dumps(self.toDict())
