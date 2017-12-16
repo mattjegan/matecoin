@@ -11,7 +11,7 @@ class Transaction(object):
         if deserialize is None:
             self.send = send
             self.recv = recv
-            self.amount = self.amount
+            self.amount = amount
         else:
             deserialized = json.loads(deserialize)
             self.send = deserialized['send']
