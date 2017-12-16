@@ -27,7 +27,16 @@ class BlockChain(object):
         self.blocks.append(block)
         self.next_block = Block(prev_hash=block.hash)
         self.updateWalletsFromDiff(block.getTransactionDiff())
+
+        print('=== BLOCK MINED ===')
         print(f'Block: {len(self.blocks)} Hash: {block.hash} Nonce: {block.nonce}')
+        print('Transactions:')
+        for t in block.transactions:
+            print(f'\t{t.send[:4]} -> {t.recv[:4]}: {t.amount}')
+        print('Wallet States:')
+        for addr, wallet in self.wallets.items():
+            print(f'\t{addr[:4]}: {wallet.amount}')
+        print()
 
     def save(self):
         with open('dd.db', 'a') as db:
@@ -49,7 +58,6 @@ class BlockChain(object):
         db.close()
 
     def addTransaction(self, send, recv, amount):
-        print(f'{send[:4]} -> {recv[:4]}: {amount}')
         self.verifyTransaction(send, recv, amount)
         self.next_block.addTransaction(send, recv, amount)
 
