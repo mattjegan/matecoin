@@ -6,7 +6,7 @@ from wallet import Wallet
 class BlockChain(object):
     def __init__(self):
         self.blocks = []
-        self.wallets = {}  # TODO: Add persistence for wallets
+        self.wallets = {}
 
         # Check if the blockchain exists and load it
         self.load()
@@ -49,9 +49,6 @@ class BlockChain(object):
         db.close()
 
     def addTransaction(self, send, recv, amount):
-        # TODO: Add verification of transaction
-        # each block will store the diff of the wallet amounts
-        # and hence the BC and verify how much DOH each wallet has
         print(f'{send[:4]} -> {recv[:4]}: {amount}')
         self.verifyTransaction(send, recv, amount)
         self.next_block.addTransaction(send, recv, amount)
