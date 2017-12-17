@@ -6,7 +6,6 @@ git clone <this_repo_url>
 
 ## Todo
 * Networking to sync the blockchain and broadcast transactions
-* Securing wallets with private keys
 * Creation of a cli
     * Create a new wallet
         * `python cli.py create_wallet <passphrase>`
