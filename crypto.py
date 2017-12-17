@@ -1,3 +1,4 @@
+from base64 import b32decode
 
 from ecdsa import SigningKey, NIST521p, VerifyingKey
 
@@ -11,7 +12,7 @@ def generate_public_key(priv_key):
 
 
 def sign(priv_key, data):
-    return priv_key.sign(data)
+    return priv_key.sign(data.encode())
 
 
 def verify_from_key(publ_key, sig, data):
@@ -19,4 +20,4 @@ def verify_from_key(publ_key, sig, data):
 
 
 def verify_from_str(publ_key, sig, data):
-    return verify_from_key(VerifyingKey.from_string(bytes.fromhex(publ_key), curve=NIST521p), sig, data)
+    return verify_from_key(VerifyingKey.from_string(b32decode(publ_key), curve=NIST521p), sig, data.encode())
